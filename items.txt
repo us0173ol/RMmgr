@@ -1,0 +1,1 @@
+Index: None   ItemID: None   ItemName: Beer   ItemPrice: $5.00 Index: None   ItemID: None   ItemName: Wine   ItemPrice: $8.00 Index: None   ItemID: None   ItemName: Liquor   ItemPrice: $9.50 Index: None   ItemID: None   ItemName: Food   ItemPrice: $15.00 
