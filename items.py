@@ -22,7 +22,5 @@ class Item:
         else:
             index_str = self.index
 
-
-
-        itemStr = 'Index: {}   ItemID: {}   ItemName: {}   ItemPrice: ${:.2f}'
-        return itemStr.format(self.index, self.itemID, self.itemName.title(), self.itemPrice)
+        return 'Index: {}   ItemID: {}   ItemName: {}   ItemPrice: ${:.2f}' \
+            .format(self.index, self.itemID, self.itemName.title(), self.itemPrice)

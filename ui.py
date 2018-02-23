@@ -1,8 +1,8 @@
-import items
+import dicts
 import saleItem
-import lists
 import textFiles
-
+import items
+import theDB
 
 def show_main_menu():
 
@@ -78,14 +78,14 @@ def add_a_sale():
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
 
-    for item in items_list:
+    for item in items_dict:
         message(item)
 
 
     while True:
         try:
             itemId = int(input('Please enter the itemID number for the item being sold. '))
-            if itemId not in items_list[0]:
+            if itemId not in items_dict:
                 message('Please enter a valid choice. ')
             else:
                 break
@@ -114,9 +114,9 @@ def add_a_sale():
 
 
 def getItemPrice(ItemID):
-    for item in items_list:
+    for item in items_dict:
         if item == item:
-            saleItemPriceEach = items.Item.saleItemPriceEach
+            saleItemPriceEach = items.Item.itemPrice
     return saleItemPriceEach
 
 def add_items():
@@ -127,12 +127,27 @@ def add_items():
 
     itemName = str(input('Enter the name of the item you would like to add. '))
     itemPrice = float(input("Enter the price of the item. "))
+    key = len(dicts.items_dict) + 1
+    dicts.items_dict.setdefault(key, [])
+    print("key: ", key)
+    # return itemName, itemPrice
 
     itemToAdd = items.Item( itemName, itemPrice)
-    lists.items_list.append(itemToAdd)
+    print (itemToAdd)
+
+    itemname = itemToAdd.itemName
+    itemprice = itemToAdd.itemPrice
+    dicts.items_dict[key].append(itemName)
+    dicts.items_dict[key].append(itemPrice)
+    # dicts.items_dict.update({key,itemname,itemprice})
+
+    print("DictItems: ", dicts.items_dict)
+
     textFiles.textFilez.write_to_item_file()
-    for item in lists.items_list:
-        print (item)
+    textFiles.textFilez.read_from_item_file_to_db()
+
+    for item in dicts.items_dict:
+        print ("item in dict: ", item)
 
 
 

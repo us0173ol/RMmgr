@@ -1,7 +1,7 @@
 import ui
 import saleItem
 import items
-import lists
+import dicts
 import datetime
 import theDB
 
