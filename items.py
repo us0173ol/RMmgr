@@ -5,15 +5,15 @@ class Item:
 
     Null_Index = None
 
-    def __init__(self, itemName, itemPrice, index=Null_Index,  itemID=Null_Index):
+    def __init__(self, itemName, itemPrice, itemID=Null_Index):
 
-        self.index = index
+
         self.itemID = itemID
         self.itemName = itemName
         self.itemPrice = itemPrice
 
-    def set_index(self, index):
-        self.index = index
+    # def set_index(self, index):
+    #     self.index = index
 
     def __str__(self):
 

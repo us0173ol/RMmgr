@@ -1,5 +1,5 @@
-import dicts
-import saleItem
+from dicts import *
+from saleItem import *
 import textFiles
 import items
 import theDB
@@ -50,104 +50,86 @@ def start_RM_program():
     while not validChoice:
         RMchoice = input('Please make a selection \n')
         if (RMchoice != '1' and RMchoice != '2' and RMchoice !='3' and RMchoice !='4'
-                and RMchoice != 'b'):
-                print('Error, please choose 1-4 or b')
+                and RMchoice != '5'):
+                print('Error, please choose 1-5')
         else:
             validChoice = True
     return RMchoice
 
 
-'''MOVE TO DATASTORE
-def populateItems():
-    menuItem1 = Items('1', 'Beer', '4')
-    menuItem2 = Items('2', 'Wine', '7')
-    menuItem3 = Items('3', 'Liqour', '8')
-    menuItem4 = Items('4', 'Food', '10')
-    '''
-
-
-
 
 def add_a_sale():
 
-    message('New sale')
+    message = 'New sale'
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
 
-    message('Items to choose from, itemID is the first number in the row. ')
+    message ='Items to choose from, itemID is the first number in the row. '
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
 
-    for item in items_dict:
-        message(item)
+
+    #
+    # print(theList)
+    # for i in theList:
+    #     for j in i:
+    #         print('j: ', j)
+    #     print('i:', i)
 
 
     while True:
         try:
-            itemId = int(input('Please enter the itemID number for the item being sold. '))
-            if itemId not in items_dict:
-                message('Please enter a valid choice. ')
-            else:
+            theList = theDB.show_menu()
+            print(theList)
+            itemID = input('Please enter the ID number for the item being sold. ')
+            itemID = int(itemID)
+            for i in theList:
+                for j in i:
+                    if itemID == j:
+                        print('Success')
+                    else:
+                        break
                 break
+            break
         except ValueError:
             message('Invalid entry1, no decimal or negative numbers')
     while True:
         try:
             saleItemQty = int(input('How many sold? Enter whole numbers only'))
             if saleItemQty < 0:
-                message('Please enter a positive whole number')
+                print('Please enter a positive whole number')
             else:
                 break
         except ValueError:
-            message('Invalid entry2, no decimal or negative numbers')
+            print('Invalid entry2, no decimal or negative numbers')
     while True:
         try:
             saleItemPriceEach = getItemPrice(itemId)
         except ValueError:
-            message('Could not find item price in list')
+            print('Could not find item price in list')
     while True:
         try:
             saleItemTotal = saleItemQty * saleItemPriceEach
         except ValueError:
-            message('Error')
+            print('Error')
+    print('Name: ', itemID, 'Qty: ', saleItemQty, 'Price: ', saleItemPriceEach, 'Total: ', saleItemTotal)
+def getItemPrice(itemID):
+    itemPrice = extract_price(itemID)
+    return itemPrice
 
+def add_edit_items():
 
-
-def getItemPrice(ItemID):
-    for item in items_dict:
-        if item == item:
-            saleItemPriceEach = items.Item.itemPrice
-    return saleItemPriceEach
-
-def add_items():
-
-    message = ('Add Items to Menu')
+    message = ('Add to/Edit Items Menu')
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
+    # print(theDB.show_items())
 
-    itemName = str(input('Enter the name of the item you would like to add. '))
+    itemName = str(input('Enter the name of the item you would like to add/edit. '))
     itemPrice = float(input("Enter the price of the item. "))
-    key = len(dicts.items_dict) + 1
-    dicts.items_dict.setdefault(key, [])
-    print("key: ", key)
-    # return itemName, itemPrice
+    items_list = theDB.add_edit_item_to_db(itemName.upper(), itemPrice)
+    for row in items_list:
+        print('ROW: ', row)
 
-    itemToAdd = items.Item( itemName, itemPrice)
-    print (itemToAdd)
-
-    itemname = itemToAdd.itemName
-    itemprice = itemToAdd.itemPrice
-    dicts.items_dict[key].append(itemName)
-    dicts.items_dict[key].append(itemPrice)
-    # dicts.items_dict.update({key,itemname,itemprice})
-
-    print("DictItems: ", dicts.items_dict)
-
-    textFiles.textFilez.write_to_item_file()
-    textFiles.textFilez.read_from_item_file_to_db()
-
-    for item in dicts.items_dict:
-        print ("item in dict: ", item)
 
 
 
@@ -183,5 +165,5 @@ def add_items():
 
 
 
-def message(message):
-    print(message)
+def message(msg):
+    print(msg)

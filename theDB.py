@@ -1,7 +1,7 @@
 import sqlite3
-from textFiles import textFilez
+# from textFiles import textFilez
 import csv
-from dicts import items_dict
+from dicts import items_list
 # from ui import add_items
 
 def setup_db():
@@ -13,32 +13,78 @@ def setup_db():
 
     try:
         c.execute('PRAGMA foreign_keys=ON')
-        c.execute('CREATE TABLE IF NOT EXISTS items (indx INTEGER PRIMARY KEY AUTOINCREMENT, itemID INTEGER, itemName TEXT, itemPrice DECIMAL);')
-        # c.execute('CREATE TABLE IF NOT EXISTS items(indx INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, itemID INTEGER NOT NULL AUTOINCREMENT, FOREIGN KEY (itemID) REFERENCES saleItems (itemID), itemName TEXT, itemPrice DECIMAL, FOREIGN KEY (itemPrice) REFERENCES saleItems (saleItemPriceEach));')
-        # c.execute('CREATE TABLE IF NOT EXISTS saleItems(indx INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, saleID INTEGER NOT NULL AUTOINCREMENT, itemID INTEGER, FOREIGN KEY (itemID) REFERENCES items (itemID), saleItemQty INTEGER, saleItemPriceEach DECIMAL, FOREIGN KEY (saleItemPriceEach) REFERENCES items (itemPrice), saleItemTotal DECIMAL, saleDate VARCHAR(10));')
-        c.execute('CREATE TABLE IF NOT EXISTS saleItems(indx INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, saleID INTEGER NOT NULL, itemID INTEGER, saleItemQty INTEGER, saleItemPriceEach DECIMAL, saleItemTotal DECIMAL, saleDate TEXT, FOREIGN KEY (itemID) REFERENCES items (itemID), FOREIGN KEY (saleItemPriceEach) REFERENCES items (itemPrice));')
+        # c.execute('DROP TABLE IF EXISTS items')
+        c.execute('CREATE TABLE IF NOT EXISTS items (itemID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, itemName TEXT UNIQUE, itemPrice DECIMAL UNIQUE);')
+        # c.execute('INSERT INTO items (itemID, itemName, itemPrice) VALUES (null, "BEER", 5)')
+
+        # c.execute('DROP TABLE IF EXISTS saleItems')
+        c.execute('CREATE TABLE IF NOT EXISTS saleItems(saleID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, itemName TEXT, saleItemQty INTEGER, saleItemPriceEach DECIMAL, saleItemTotal DECIMAL, saleDate TEXT, FOREIGN KEY (itemName) REFERENCES items (itemName),FOREIGN KEY (saleItemPriceEach) REFERENCES items (itemPrice) ON UPDATE CASCADE);')
+        # c.execute('INSERT INTO saleItems(saleID, itemName, saleItemQty, saleItemPriceEach, saleItemTotal, saleDate) VALUES (null, "BEER", 5, 5, 25, "2018-02-14" )')
         db.commit()
 
     except sqlite3.Error as err:
-        print('{} = ERROR'.format(err))
+        print(err)
 
-    try:
-        for item in items_dict:
-            c.execute('INSERT OR REPLACE INTO items(indx, itemID, itemName, itemPrice) VALUES (null,?,?,?)', [items_dict['index'],items_dict['itemID'], items_dict['itemName'], items_dict['itemPrice']])
-        db.commit()
+    # try:
+    #     for item in items_dict:
+    #         c.execute('INSERT OR REPLACE INTO items(indx, itemID, itemName, itemPrice) VALUES (null,?,?,?)', [items_dict['index'],items_dict['itemID'], items_dict['itemName'], items_dict['itemPrice']])
+    #     db.commit()
         # data = textFilez.read_from_item_file_to_db()
         # print(data)
+    #
+    # except sqlite3.Error as err:
+    #     print('{} = ERROR2'.format(err))
 
-    except sqlite3.Error as err:
-        print('{} = ERROR2'.format(err))
+def add_edit_item_to_db(itemName, itemPrice):
+    db_filename  = "RMmgr_db.db"
+    db = sqlite3.connect(db_filename)
+    c = db.cursor()
+    rows_mod = c.execute('UPDATE items SET itemPrice = ? WHERE itemName = ?', (itemPrice, itemName))
+    if rows_mod.rowcount == 0:
+        c.execute('INSERT INTO items(itemID, itemName, itemPrice) VALUES (null,?,?);', (itemName,itemPrice))
+    # c.execute('DROP TABLE saleItems')
+    items_list = []
+    db.commit()
+    c.execute('SELECT * FROM items')
+    for row in c:
+        # print(row)
+        items_list.append(row)
+    return items_list
 
-# def add_item_to_db(itemName, itemPrice):
-#     db_filename  = "RMmgr_db.db"
-#     db = sqlite3.connect(db_filename)
-#     c = db.cursor()
-#     c.execute('INSERT OR REPLACE INTO items(itemName, itemPrice) VALUES (null,null,?,?);', (itemName,itemPrice)
+def show_items():
+    db_filename  = "RMmgr_db.db"
+    db = sqlite3.connect(db_filename)
+    c = db.cursor()
+    c.execute('SELECT itemName, itemPrice FROM items')
+    for row in c:
+        print(row)
 
+def show_menu():
+    db_filename  = "RMmgr_db.db"
+    db = sqlite3.connect(db_filename)
+    c = db.cursor()
+    theList = []
+    items_list = c.execute('SELECT itemID, itemName FROM items')
+    for row in c:
+        theList.append(row)
+    return theList
 
+def extract_price(itemID):
+    db_filename  = "RMmgr_db.db"
+    db = sqlite3.connect(db_filename)
+    c = db.cursor()
+    itemPrice = c.execute('SELECT itemPrice FROM items WHERE itemID = ?', (itemID))
+    return itemPrice
+
+def get_ids_list():
+    ids = []
+    db_filename  = "RMmgr_db.db"
+    db = sqlite3.connect(db_filename)
+    c = db.cursor()
+    c.execute('SELECT itemID from items')
+    for i in c:
+        ids.append(i)
+    return ids
 def main():
     setup_db()
     # add_item_to_db()
