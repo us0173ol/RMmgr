@@ -3,6 +3,8 @@ from saleItem import *
 import textFiles
 import items
 import theDB
+import datetime
+from datetime import date, datetime
 
 def show_main_menu():
 
@@ -59,66 +61,36 @@ def start_RM_program():
 
 
 def add_a_sale():
-
+    items = load_items_dict()
+    # print('ITEMZ: ', items)
     message = 'New sale'
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
 
-    message ='Items to choose from, itemID is the first number in the row. '
+    message ='Items to choose from. '
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
 
-
-    #
-    # print(theList)
-    # for i in theList:
-    #     for j in i:
-    #         print('j: ', j)
-    #     print('i:', i)
-
-
-    while True:
-        try:
-            theList = theDB.show_menu()
-            print(theList)
-            itemID = input('Please enter the ID number for the item being sold. ')
-            itemID = int(itemID)
-            for i in theList:
-                for j in i:
-                    if itemID == j:
-                        print('Success')
-                    else:
-                        break
-                break
-            break
-        except ValueError:
-            message('Invalid entry1, no decimal or negative numbers')
-    while True:
-        try:
-            saleItemQty = int(input('How many sold? Enter whole numbers only'))
-            if saleItemQty < 0:
-                print('Please enter a positive whole number')
-            else:
-                break
-        except ValueError:
-            print('Invalid entry2, no decimal or negative numbers')
-    while True:
-        try:
-            saleItemPriceEach = getItemPrice(itemId)
-        except ValueError:
-            print('Could not find item price in list')
-    while True:
-        try:
+    theDB.show_items()
+    itemName = input('Please enter the name of the item being sold...')
+    while itemName in items:
+        saleItemQty = int(input('How many sold? Enter whole numbers only...'))
+        while saleItemQty > 0:
+            saleItemPriceEach = getItemPrice(itemName)
             saleItemTotal = saleItemQty * saleItemPriceEach
-        except ValueError:
-            print('Error')
-    print('Name: ', itemID, 'Qty: ', saleItemQty, 'Price: ', saleItemPriceEach, 'Total: ', saleItemTotal)
-def getItemPrice(itemID):
-    itemPrice = extract_price(itemID)
-    return itemPrice
+            saleDate = date.today()
+            break
+        break
+
+
+    print('Name: ', itemName, 'Qty: ', saleItemQty, 'Price: ', saleItemPriceEach, 'Total: ', saleItemTotal, 'Date: ', saleDate )
+
+    theDB.add_sale_to_db(itemName, saleItemQty, saleItemPriceEach, saleItemTotal, saleDate)
+
+
 
 def add_edit_items():
-
+    load_items_dict()
     message = ('Add to/Edit Items Menu')
     line = "_" * len(message)
     print('\n', line, '\n', message, '\n', line)
@@ -126,9 +98,12 @@ def add_edit_items():
 
     itemName = str(input('Enter the name of the item you would like to add/edit. '))
     itemPrice = float(input("Enter the price of the item. "))
+    add_edit_dict(itemName, itemPrice)
     items_list = theDB.add_edit_item_to_db(itemName.upper(), itemPrice)
-    for row in items_list:
-        print('ROW: ', row)
+    show_items_dict()
+    save_items_dict()
+    # for row in items_list:
+    #     print('ROW: ', row)
 
 
 

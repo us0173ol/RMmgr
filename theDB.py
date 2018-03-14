@@ -1,7 +1,7 @@
 import sqlite3
 # from textFiles import textFilez
 import csv
-from dicts import items_list
+from dicts import *
 # from ui import add_items
 
 def setup_db():
@@ -11,14 +11,20 @@ def setup_db():
     db = sqlite3.connect(db_filename)
     c = db.cursor()
 
+
+
     try:
         c.execute('PRAGMA foreign_keys=ON')
         # c.execute('DROP TABLE IF EXISTS items')
-        c.execute('CREATE TABLE IF NOT EXISTS items (itemID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, itemName TEXT UNIQUE, itemPrice DECIMAL UNIQUE);')
+        c.execute('CREATE TABLE IF NOT EXISTS items (itemID INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE, itemName TEXT UNIQUE, itemPrice DECIMAL);')
         # c.execute('INSERT INTO items (itemID, itemName, itemPrice) VALUES (null, "BEER", 5)')
-
+        # itemPrice = c.execute('SELECT itemPrice FROM items WHERE itemID = ?', ('1'))
+        # for row in itemPrice:
+        #
+        #     print('itemPrice: ', row)
         # c.execute('DROP TABLE IF EXISTS saleItems')
-        c.execute('CREATE TABLE IF NOT EXISTS saleItems(saleID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, itemName TEXT, saleItemQty INTEGER, saleItemPriceEach DECIMAL, saleItemTotal DECIMAL, saleDate TEXT, FOREIGN KEY (itemName) REFERENCES items (itemName),FOREIGN KEY (saleItemPriceEach) REFERENCES items (itemPrice) ON UPDATE CASCADE);')
+        c.execute('CREATE TABLE IF NOT EXISTS saleItems(saleID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, itemName TEXT, saleItemQty INTEGER, saleItemPriceEach DECIMAL, saleItemTotal DECIMAL, saleDate TEXT, FOREIGN KEY (itemName) REFERENCES items (itemName));')
+            # ,FOREIGN KEY (saleItemPriceEach) REFERENCES items (itemPrice) ON UPDATE CASCADE
         # c.execute('INSERT INTO saleItems(saleID, itemName, saleItemQty, saleItemPriceEach, saleItemTotal, saleDate) VALUES (null, "BEER", 5, 5, 25, "2018-02-14" )')
         db.commit()
 
@@ -34,6 +40,13 @@ def setup_db():
     #
     # except sqlite3.Error as err:
     #     print('{} = ERROR2'.format(err))
+def add_sale_to_db(itemName, saleItemQty, saleItemPriceEach, saleItemTotal, saleDate):
+    db_filename  = "RMmgr_db.db"
+    db = sqlite3.connect(db_filename)
+    c = db.cursor()
+    c.execute('INSERT INTO saleItems(saleID, itemName, saleItemQty, saleItemPriceEach, saleItemTotal, saleDate) VALUES (null,?,?,?,?,?);', (itemName, saleItemQty, saleItemPriceEach, saleItemTotal, saleDate))
+    # c.execute('DROP TABLE saleItems')
+    db.commit()
 
 def add_edit_item_to_db(itemName, itemPrice):
     db_filename  = "RMmgr_db.db"
@@ -43,13 +56,7 @@ def add_edit_item_to_db(itemName, itemPrice):
     if rows_mod.rowcount == 0:
         c.execute('INSERT INTO items(itemID, itemName, itemPrice) VALUES (null,?,?);', (itemName,itemPrice))
     # c.execute('DROP TABLE saleItems')
-    items_list = []
     db.commit()
-    c.execute('SELECT * FROM items')
-    for row in c:
-        # print(row)
-        items_list.append(row)
-    return items_list
 
 def show_items():
     db_filename  = "RMmgr_db.db"
@@ -68,13 +75,6 @@ def show_menu():
     for row in c:
         theList.append(row)
     return theList
-
-def extract_price(itemID):
-    db_filename  = "RMmgr_db.db"
-    db = sqlite3.connect(db_filename)
-    c = db.cursor()
-    itemPrice = c.execute('SELECT itemPrice FROM items WHERE itemID = ?', (itemID))
-    return itemPrice
 
 def get_ids_list():
     ids = []

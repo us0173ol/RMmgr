@@ -38,7 +38,7 @@ def main(MC):
         elif main_choice == '5':
             print('main choice 5')
         elif main_choice == 'q':
-            print('Bye Felicia')
+            print('Bye')
             quit()
 
 
